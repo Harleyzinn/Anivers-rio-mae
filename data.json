@@ -4,12 +4,10 @@
     
     { "id": "origem", "group": 2, "name": "A Faísca (1984)", "val": 12, "text": "1984. O momento em que o cosmos decidiu que o mundo precisava de mais doçura e força. Uma estrela que nasceu pronta para iluminar." },
     { "id": "forca", "group": 2, "name": "Resiliência Pura", "val": 10, "text": "Sua força não faz barulho, ela faz história. Você é a prova de que a maior resistência está na suavidade. O pilar invisível de tudo." },
-
     
     { "id": "filhos", "group": 3, "name": "Adrian & Arthur", "val": 18, "text": "Nossas vidas são extensões da sua órbita. Dois mundos inteiros formados pela sua luz e pelo seu amor. Tudo o que somos de bom é reflexo seu." },
     { "id": "amor", "group": 3, "name": "Gravidade do Amor", "val": 10, "text": "Seu amor não é possessão, é porto seguro. Uma gravidade suave, que não prende, mas que sempre nos mostra onde é o nosso lugar no mundo." },
     
-   
     { "id": "poema_tempo", "group": 4, "name": "Poema: O Tempo", "val": 10, "text": "'O tempo passa, mas para você ele é um artesão. Ele apenas lustra e dá ainda mais valor à sua história. Quarenta e dois anos de uma beleza que vem de dentro e transborda.'" },
     { "id": "poema_luz", "group": 4, "name": "Poema: Luz Interior", "val": 10, "text": "'Não há noite escura ou dia nublado que a sua presença não consiga clarear. Você carrega o sol no peito e distribui calor sem nem perceber, aquecendo quem tem a sorte de estar perto.'" },
     { "id": "poema_agua", "group": 4, "name": "Poema: Água", "val": 10, "text": "'Sua força é como a água, mãe. Ela se adapta, contorna obstáculos e, no fim, é capaz de moldar até a rocha mais dura da vida. Força fluida e imbatível.'" },
