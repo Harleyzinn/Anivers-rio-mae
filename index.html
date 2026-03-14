@@ -117,8 +117,8 @@
   <p id="poem-text"></p>
 </div>
 
-<script src="//unpkg.com/three"></script>
-<script src="//unpkg.com/3d-force-graph"></script>
+<script src="https://unpkg.com/three@0.147.0/build/three.min.js"></script>
+<script src="https://unpkg.com/3d-force-graph@1.43.3/dist/3d-force-graph.min.js"></script>
 
 <script>
   const elem = document.getElementById('3d-graph');
@@ -127,7 +127,7 @@
   const pText = document.getElementById('poem-text');
   const closeBtn = document.getElementById('close-btn');
 
-  // Gerador de Textura de Estrela (100% à prova de falhas)
+  // Gerador de Textura de Estrela
   function createGlowTexture() {
     const canvas = document.createElement('canvas');
     canvas.width = 64; canvas.height = 64;
@@ -149,10 +149,8 @@
     .backgroundColor('#020205') 
     .showNavInfo(false)
     .nodeThreeObject(node => {
-        // Cores personalizadas: Ouro pra mãe, azul pros filhos, prata pros poemas
         const color = (node.group === 1) ? '#e0ca9e' : (node.group === 3 ? '#8aa8c2' : '#d4e2ed');
         
-        // Criando o material que brilha nativamente
         const material = new THREE.SpriteMaterial({
             map: glowTexture,
             color: color,
@@ -162,7 +160,7 @@
         });
         
         const sprite = new THREE.Sprite(material);
-        const size = (node.val || 5) * 1.5; // Tamanho
+        const size = (node.val || 5) * 1.5; 
         sprite.scale.set(size, size, 1);
         return sprite;
     })
