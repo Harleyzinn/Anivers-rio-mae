@@ -9,24 +9,23 @@
   
   <style>
     :root {
-      --champagne-gold: rgba(224, 202, 158, 0.85); /* Cor champagne pálido */
-      --deep-space: #020205; /* Preto azulado profundo */
+      --champagne-gold: rgba(224, 202, 158, 0.9); 
+      --deep-space: #020205; 
       --text-main: #e8e8e8;
-      --blur-bg: rgba(10, 15, 25, 0.75); /* Fundo Translúcido Deep */
+      --blur-bg: rgba(10, 15, 25, 0.75); 
     }
 
     body { 
       margin: 0; 
       overflow: hidden; 
-      background-color: #000; 
+      background-color: var(--deep-space); 
       color: var(--text-main); 
       touch-action: none; 
-      -webkit-tap-highlight-color: transparent; /* Remove o highlight de toque no iOS */
+      -webkit-tap-highlight-color: transparent; 
     }
     
     #3d-graph { width: 100vw; height: 100vh; }
     
-    /* Painel Mobile/Elegante Glassmorphism 2.0 */
     #poem-panel {
       position: absolute; 
       bottom: 6vh; 
@@ -41,14 +40,13 @@
       padding: 30px 20px 25px;
       overflow-y: auto; 
       display: none;
-      backdrop-filter: blur(15px); /* Desfoque profundo */
+      backdrop-filter: blur(15px); 
       -webkit-backdrop-filter: blur(15px);
       box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8);
       z-index: 10;
-      transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+      transition: all 0.4s ease;
     }
     
-    /* Fontes Título (Elegante Doris) */
     #poem-panel h2 { 
       font-family: 'Doris', serif; 
       font-size: 1.4em; 
@@ -59,7 +57,6 @@
       text-align: center;
     }
     
-    /* Fontes Corpo (Clean Duru Sans) */
     #poem-panel p { 
       font-family: 'Duru Sans', sans-serif;
       font-size: 1.05em; 
@@ -70,7 +67,6 @@
       text-align: justify;
     }
 
-    /* Botão de fechar elegante */
     #close-btn {
       position: absolute;
       top: -20px;
@@ -96,7 +92,6 @@
       color: #fff;
     }
     
-    /* Instruções iniciais limpas */
     #instructions {
       font-family: 'Duru Sans', sans-serif;
       position: absolute; 
@@ -114,7 +109,7 @@
 <body>
 
 <div id="3d-graph"></div>
-<div id="instructions">Toque e explore a constelação</div>
+<div id="instructions">Toque nas estrelas para explorar a constelação</div>
 
 <div id="poem-panel">
   <button id="close-btn">✕</button>
@@ -122,14 +117,8 @@
   <p id="poem-text"></p>
 </div>
 
-<script src="//unpkg.com/3d-force-graph"></script>
 <script src="//unpkg.com/three"></script>
-<script src="//unpkg.com/three/examples/js/postprocessing/EffectComposer.js"></script>
-<script src="//unpkg.com/three/examples/js/postprocessing/RenderPass.js"></script>
-<script src="//unpkg.com/three/examples/js/postprocessing/UnrealBloomPass.js"></script>
-<script src="//unpkg.com/three/examples/js/postprocessing/ShaderPass.js"></script>
-<script src="//unpkg.com/three/examples/js/shaders/CopyShader.js"></script>
-<script src="//unpkg.com/three/examples/js/shaders/LuminosityHighLightShader.js"></script>
+<script src="//unpkg.com/3d-force-graph"></script>
 
 <script>
   const elem = document.getElementById('3d-graph');
@@ -138,59 +127,61 @@
   const pText = document.getElementById('poem-text');
   const closeBtn = document.getElementById('close-btn');
 
-  // Inicializa o grafo
+  // Gerador de Textura de Estrela (100% à prova de falhas)
+  function createGlowTexture() {
+    const canvas = document.createElement('canvas');
+    canvas.width = 64; canvas.height = 64;
+    const ctx = canvas.getContext('2d');
+    const gradient = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
+    gradient.addColorStop(0, 'rgba(255,255,255,1)');
+    gradient.addColorStop(0.2, 'rgba(255,255,255,0.8)');
+    gradient.addColorStop(0.5, 'rgba(255,255,255,0.2)');
+    gradient.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = gradient;
+    ctx.fillRect(0, 0, 64, 64);
+    return new THREE.CanvasTexture(canvas);
+  }
+
+  const glowTexture = createGlowTexture();
+
   const Graph = ForceGraph3D()(elem)
     .jsonUrl('data.json')
     .backgroundColor('#020205') 
-    .showNavInfo(false);
-
-  // --- Melhorias Gráficas ---
-  Graph
-    // Nós como Estrelas Reais (Usa sprite para textura suave)
+    .showNavInfo(false)
     .nodeThreeObject(node => {
-        // Cor champagne suave para a mãe, azul suave para outros, branco suave para o resto
+        // Cores personalizadas: Ouro pra mãe, azul pros filhos, prata pros poemas
         const color = (node.group === 1) ? '#e0ca9e' : (node.group === 3 ? '#8aa8c2' : '#d4e2ed');
-        const spriteMaterial = new THREE.SpriteMaterial({
-            map: new THREE.TextureLoader().load('https://raw.githubusercontent.com/t-5/three.js-examples/master/textures/star.png'), // Textura de estrela
+        
+        // Criando o material que brilha nativamente
+        const material = new THREE.SpriteMaterial({
+            map: glowTexture,
             color: color,
             transparent: true,
-            blending: THREE.AdditiveBlending
+            blending: THREE.AdditiveBlending,
+            depthWrite: false
         });
-        const sprite = new THREE.Sprite(spriteMaterial);
-        sprite.scale.set(node.val * 1.5, node.val * 1.5, 1); // Escala baseada no valor
+        
+        const sprite = new THREE.Sprite(material);
+        const size = (node.val || 5) * 1.5; // Tamanho
+        sprite.scale.set(size, size, 1);
         return sprite;
     })
     .nodeLabel('name') 
-    
-    // Conexões de Luz Filamentosas
     .linkColor(() => 'rgba(255, 255, 255, 0.12)') 
     .linkWidth(0.5)
-    .linkDirectionalParticles(1) 
-    .linkDirectionalParticleSpeed(d => d.value * 0.001)
-    .linkDirectionalParticleColor(() => 'rgba(224, 202, 158, 0.6)');
+    .linkDirectionalParticles(2) 
+    .linkDirectionalParticleSpeed(d => d.value * 0.0015)
+    .linkDirectionalParticleWidth(1.5)
+    .linkDirectionalParticleColor(() => 'rgba(224, 202, 158, 0.8)');
 
-  // Configuração avançada de Post-Processing (BLOOM)
-  const composer = new THREE.EffectComposer(Graph.renderer());
-  const renderPass = new THREE.RenderPass(Graph.scene(), Graph.camera());
-  composer.addPass(renderPass);
-
-  // Adiciona Bloom Pass (Parâmetros que geram o brilho da imagem guide)
-  const bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
-  composer.addPass(bloomPass);
-
-  // Substitui o renderizador padrão pelo composer
-  Graph.renderer().setAnimationLoop(() => composer.render());
-
-  // --- Interações ---
   Graph.onNodeClick(node => {
-    // Zoom cinematográfico
     const distance = 80;
     const distRatio = 1 + distance/Math.hypot(node.x, node.y, node.z);
     
     Graph.cameraPosition(
       { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio },
       node, 
-      2500 // Tempo de transição suave
+      2000 
     );
 
     pTitle.innerText = node.name;
@@ -205,15 +196,6 @@
   Graph.onBackgroundClick(() => {
     panel.style.display = 'none';
   });
-
-  // Ajusta o composer no redimensionamento da janela
-  window.addEventListener('resize', () => {
-    const width = window.innerWidth;
-    const height = window.innerHeight;
-    composer.setSize(width, height);
-    bloomPass.setSize(width, height);
-  });
-
 </script>
 </body>
 </html>
