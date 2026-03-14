@@ -3,76 +3,104 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-  <title>Constelação - 42 Anos</title>
+  <title>Mãespace - 42 Anos</title>
+  
+  <link href="https://fonts.googleapis.com/css2?family=Duru+Sans&family=Doris&display=swap" rel="stylesheet">
+  
   <style>
+    :root {
+      --champagne-gold: rgba(224, 202, 158, 0.85); /* Cor champagne pálido */
+      --deep-space: #020205; /* Preto azulado profundo */
+      --text-main: #e8e8e8;
+      --blur-bg: rgba(10, 15, 25, 0.75); /* Fundo Translúcido Deep */
+    }
+
     body { 
       margin: 0; 
       overflow: hidden; 
       background-color: #000; 
-      font-family: 'Helvetica Neue', Arial, sans-serif; 
-      color: #fff; 
-      touch-action: none; /* Previne comportamentos indesejados no mobile */
+      color: var(--text-main); 
+      touch-action: none; 
+      -webkit-tap-highlight-color: transparent; /* Remove o highlight de toque no iOS */
     }
+    
     #3d-graph { width: 100vw; height: 100vh; }
     
-    /* Painel Mobile-Friendly */
+    /* Painel Mobile/Elegante Glassmorphism 2.0 */
     #poem-panel {
       position: absolute; 
-      bottom: 5%; 
+      bottom: 6vh; 
       left: 50%; 
       transform: translateX(-50%);
-      width: 85%; 
-      max-width: 400px;
+      width: 88vw; 
+      max-width: 420px;
       max-height: 60vh;
-      background: rgba(10, 15, 25, 0.85);
-      border: 1px solid rgba(255, 255, 255, 0.2); 
-      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
-      border-radius: 16px; 
-      padding: 25px 20px 20px;
+      background: var(--blur-bg);
+      border: 1px solid rgba(255, 255, 255, 0.1); 
+      border-radius: 20px; 
+      padding: 30px 20px 25px;
       overflow-y: auto; 
       display: none;
-      backdrop-filter: blur(10px); 
-      -webkit-backdrop-filter: blur(10px);
+      backdrop-filter: blur(15px); /* Desfoque profundo */
+      -webkit-backdrop-filter: blur(15px);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8);
       z-index: 10;
+      transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
     }
     
+    /* Fontes Título (Elegante Doris) */
     #poem-panel h2 { 
-      font-size: 1.3em; 
-      color: #e0ca9e; /* Tom de ouro pálido/champagne, mais elegante */
+      font-family: 'Doris', serif; 
+      font-size: 1.4em; 
+      color: var(--champagne-gold); 
       margin: 0 0 15px 0; 
       font-weight: 300;
       letter-spacing: 1px;
+      text-align: center;
     }
     
+    /* Fontes Corpo (Clean Duru Sans) */
     #poem-panel p { 
-      font-size: 1em; 
+      font-family: 'Duru Sans', sans-serif;
+      font-size: 1.05em; 
       line-height: 1.6; 
-      color: #e8e8e8; 
+      color: var(--text-main); 
       font-weight: 300;
       margin: 0;
+      text-align: justify;
     }
 
-    /* Botão de fechar para o mobile */
+    /* Botão de fechar elegante */
     #close-btn {
       position: absolute;
-      top: 15px;
+      top: -20px;
       right: 15px;
-      background: none;
-      border: none;
-      color: rgba(255, 255, 255, 0.5);
-      font-size: 1.2em;
+      background: var(--blur-bg);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      color: rgba(255, 255, 255, 0.7);
+      font-size: 1.1em;
       cursor: pointer;
-      padding: 5px;
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.4);
+      z-index: 11;
+      backdrop-filter: blur(15px);
     }
 
     #close-btn:active {
+      transform: scale(0.9);
       color: #fff;
     }
     
     /* Instruções iniciais limpas */
     #instructions {
+      font-family: 'Duru Sans', sans-serif;
       position: absolute; 
-      top: 15px; 
+      top: 25px; 
       width: 100%;
       text-align: center;
       pointer-events: none; 
@@ -86,7 +114,7 @@
 <body>
 
 <div id="3d-graph"></div>
-<div id="instructions">Toque e arraste para explorar o universo</div>
+<div id="instructions">Toque e explore a constelação</div>
 
 <div id="poem-panel">
   <button id="close-btn">✕</button>
@@ -96,6 +124,12 @@
 
 <script src="//unpkg.com/3d-force-graph"></script>
 <script src="//unpkg.com/three"></script>
+<script src="//unpkg.com/three/examples/js/postprocessing/EffectComposer.js"></script>
+<script src="//unpkg.com/three/examples/js/postprocessing/RenderPass.js"></script>
+<script src="//unpkg.com/three/examples/js/postprocessing/UnrealBloomPass.js"></script>
+<script src="//unpkg.com/three/examples/js/postprocessing/ShaderPass.js"></script>
+<script src="//unpkg.com/three/examples/js/shaders/CopyShader.js"></script>
+<script src="//unpkg.com/three/examples/js/shaders/LuminosityHighLightShader.js"></script>
 
 <script>
   const elem = document.getElementById('3d-graph');
@@ -104,33 +138,59 @@
   const pText = document.getElementById('poem-text');
   const closeBtn = document.getElementById('close-btn');
 
+  // Inicializa o grafo
   const Graph = ForceGraph3D()(elem)
     .jsonUrl('data.json')
     .backgroundColor('#020205') 
-    .showNavInfo(false)
-    .nodeColor(node => {
-        if(node.group === 1) return '#e0ca9e'; // Ouro/Champagne para ela
-        if(node.group === 3) return '#8aa8c2'; // Azul suave para vocês (filhos/lar)
-        return '#d4e2ed'; // Branco azulado para o resto
-    })
-    .nodeVal(node => node.val || 5)
-    .nodeOpacity(0.9)
-    .nodeLabel('name') 
-    .linkColor(() => 'rgba(255, 255, 255, 0.15)') 
-    .linkWidth(0.5)
-    .linkDirectionalParticles(1) // Otimizado para não travar no mobile
-    .linkDirectionalParticleSpeed(d => d.value * 0.001)
-    .linkDirectionalParticleColor(() => 'rgba(224, 202, 158, 0.8)');
+    .showNavInfo(false);
 
+  // --- Melhorias Gráficas ---
+  Graph
+    // Nós como Estrelas Reais (Usa sprite para textura suave)
+    .nodeThreeObject(node => {
+        // Cor champagne suave para a mãe, azul suave para outros, branco suave para o resto
+        const color = (node.group === 1) ? '#e0ca9e' : (node.group === 3 ? '#8aa8c2' : '#d4e2ed');
+        const spriteMaterial = new THREE.SpriteMaterial({
+            map: new THREE.TextureLoader().load('https://raw.githubusercontent.com/t-5/three.js-examples/master/textures/star.png'), // Textura de estrela
+            color: color,
+            transparent: true,
+            blending: THREE.AdditiveBlending
+        });
+        const sprite = new THREE.Sprite(spriteMaterial);
+        sprite.scale.set(node.val * 1.5, node.val * 1.5, 1); // Escala baseada no valor
+        return sprite;
+    })
+    .nodeLabel('name') 
+    
+    // Conexões de Luz Filamentosas
+    .linkColor(() => 'rgba(255, 255, 255, 0.12)') 
+    .linkWidth(0.5)
+    .linkDirectionalParticles(1) 
+    .linkDirectionalParticleSpeed(d => d.value * 0.001)
+    .linkDirectionalParticleColor(() => 'rgba(224, 202, 158, 0.6)');
+
+  // Configuração avançada de Post-Processing (BLOOM)
+  const composer = new THREE.EffectComposer(Graph.renderer());
+  const renderPass = new THREE.RenderPass(Graph.scene(), Graph.camera());
+  composer.addPass(renderPass);
+
+  // Adiciona Bloom Pass (Parâmetros que geram o brilho da imagem guide)
+  const bloomPass = new THREE.UnrealBloomPass(new THREE.Vector2(window.innerWidth, window.innerHeight), 1.5, 0.4, 0.85);
+  composer.addPass(bloomPass);
+
+  // Substitui o renderizador padrão pelo composer
+  Graph.renderer().setAnimationLoop(() => composer.render());
+
+  // --- Interações ---
   Graph.onNodeClick(node => {
-    // Zoom mais suave e adaptado para telas menores
+    // Zoom cinematográfico
     const distance = 80;
     const distRatio = 1 + distance/Math.hypot(node.x, node.y, node.z);
     
     Graph.cameraPosition(
       { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio },
       node, 
-      2000 
+      2500 // Tempo de transição suave
     );
 
     pTitle.innerText = node.name;
@@ -138,7 +198,6 @@
     panel.style.display = 'block';
   });
 
-  // Fecha o painel
   closeBtn.addEventListener('click', () => {
     panel.style.display = 'none';
   });
@@ -147,7 +206,14 @@
     panel.style.display = 'none';
   });
 
+  // Ajusta o composer no redimensionamento da janela
+  window.addEventListener('resize', () => {
+    const width = window.innerWidth;
+    const height = window.innerHeight;
+    composer.setSize(width, height);
+    bloomPass.setSize(width, height);
+  });
+
 </script>
 </body>
-  </html>
-  
+</html>
