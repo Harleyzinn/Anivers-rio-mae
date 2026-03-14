@@ -1,33 +1,32 @@
 {
   "nodes": [
-    { "id": "centro", "group": 1, "name": "42 Voltas ao Sol", "val": 25, "text": "O centro absoluto da nossa constelação. Quarenta e duas voltas ao sol espalhando luz e mantendo tudo no lugar. Feliz aniversário, mãe." },
+    { "id": "centro", "group": 1, "name": "42 Voltas ao Sol", "val": 30, "text": "A gravidade mais doce do nosso universo. Quarenta e duas primaveras, outonos, verões e invernos. Cada um deles contribuindo para a luz que você espalha hoje. Feliz aniversário, Mãe." },
     
-    { "id": "origem", "group": 2, "name": "1984: A Origem", "val": 10, "text": "O ano em que o mundo ganhou o seu primeiro suspiro. Uma faísca que cresceu, enfrentou a vida de peito aberto e se tornou a imensidão que você é hoje." },
+    { "id": "origem", "group": 2, "name": "A Faísca (1984)", "val": 12, "text": "1984. O momento em que o cosmos decidiu que o mundo precisava de mais doçura e força. Uma estrela que nasceu pronta para iluminar." },
+    { "id": "forca", "group": 2, "name": "Resiliência Pura", "val": 10, "text": "Sua força não faz barulho, ela faz história. Você é a prova de que a maior resistência está na suavidade. O pilar invisível de tudo." },
+
     
-    { "id": "filhos", "group": 3, "name": "Os Satélites (Adrian e Arthur)", "val": 15, "text": "Eu e o Arthur somos os satélites dessa história. A gente gira, cresce e explora o mundo, mas é a sua gravidade que nos impede de nos perdermos no escuro." },
+    { "id": "filhos", "group": 3, "name": "Adrian & Arthur", "val": 18, "text": "Nossas vidas são extensões da sua órbita. Dois mundos inteiros formados pela sua luz e pelo seu amor. Tudo o que somos de bom é reflexo seu." },
+    { "id": "amor", "group": 3, "name": "Gravidade do Amor", "val": 10, "text": "Seu amor não é possessão, é porto seguro. Uma gravidade suave, que não prende, mas que sempre nos mostra onde é o nosso lugar no mundo." },
     
-    { "id": "poema_agua", "group": 4, "name": "Poema: Força Fluida", "val": 12, "text": "'Sua força não é de ferro, mãe, é de água. Ela não quebra com os golpes do mundo. Ela se adapta, contorna os obstáculos e, no fim, é capaz de moldar até a rocha mais dura.'" },
+   
+    { "id": "poema_tempo", "group": 4, "name": "Poema: O Tempo", "val": 10, "text": "'O tempo passa, mas para você ele é um artesão. Ele apenas lustra e dá ainda mais valor à sua história. Quarenta e dois anos de uma beleza que vem de dentro e transborda.'" },
+    { "id": "poema_luz", "group": 4, "name": "Poema: Luz Interior", "val": 10, "text": "'Não há noite escura ou dia nublado que a sua presença não consiga clarear. Você carrega o sol no peito e distribui calor sem nem perceber, aquecendo quem tem a sorte de estar perto.'" },
+    { "id": "poema_agua", "group": 4, "name": "Poema: Água", "val": 10, "text": "'Sua força é como a água, mãe. Ela se adapta, contorna obstáculos e, no fim, é capaz de moldar até a rocha mais dura da vida. Força fluida e imbatível.'" },
     
-    { "id": "abrigo", "group": 3, "name": "Nosso Refúgio", "val": 10, "text": "O mundo lá fora cobra, julga e cansa. Mas o som da sua voz e a paz do nosso lar são o único abrigo que a gente realmente precisa para recomeçar." },
-    
-    { "id": "poema_tempo", "group": 4, "name": "Poema: A Escultura do Tempo", "val": 12, "text": "'O tempo não te consome, ele te esculpe. Cada ano não é um peso, é uma nova camada de ouro sobre uma estrutura que já nasceu inabalável. 42 anos de pura obra de arte.'" },
-    
-    { "id": "poema_silencio", "group": 4, "name": "Poema: O Som da Paz", "val": 10, "text": "'Você é o silêncio confortável depois de um dia de tempestade. Onde a vida exige barulho e pressa, você nos ensinou a força absurda que existe na calmaria.'" },
-    
-    { "id": "futuro", "group": 5, "name": "O Que Vem Pela Frente", "val": 15, "text": "Que os seus próximos anos sejam leves. Que você possa colher toda a paz que plantou em nós. Nós estaremos aqui, na primeira fileira, aplaudindo cada sorriso seu." }
+    { "id": "futuro", "group": 5, "name": "Próximas Jornadas", "val": 15, "text": "Que seus próximos 42 anos sejam de colheita. Que a paz que você plantou em nós retorne em dobro para você. Nós estaremos aqui, sempre orbitando e celebrando você." }
   ],
   "links": [
     { "source": "centro", "target": "origem", "value": 3 },
-    { "source": "centro", "target": "filhos", "value": 6 },
-    { "source": "filhos", "target": "abrigo", "value": 4 },
-    { "source": "abrigo", "target": "centro", "value": 3 },
-    { "source": "centro", "target": "poema_agua", "value": 2 },
-    { "source": "filhos", "target": "poema_agua", "value": 2 },
-    { "source": "origem", "target": "poema_tempo", "value": 3 },
-    { "source": "poema_tempo", "target": "centro", "value": 4 },
-    { "source": "abrigo", "target": "poema_silencio", "value": 2 },
-    { "source": "poema_silencio", "target": "centro", "value": 2 },
-    { "source": "centro", "target": "futuro", "value": 5 },
-    { "source": "futuro", "target": "filhos", "value": 3 }
+    { "source": "centro", "target": "forca", "value": 4 },
+    { "source": "centro", "target": "filhos", "value": 7 },
+    { "source": "filhos", "target": "amor", "value": 3 },
+    { "source": "origem", "target": "poema_tempo", "value": 2 },
+    { "source": "forca", "target": "poema_agua", "value": 2 },
+    { "source": "filhos", "target": "poema_luz", "value": 3 },
+    { "source": "poema_tempo", "target": "centro", "value": 3 },
+    { "source": "poema_agua", "target": "centro", "value": 3 },
+    { "source": "poema_luz", "target": "centro", "value": 3 },
+    { "source": "centro", "target": "futuro", "value": 5 }
   ]
 }
