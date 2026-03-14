@@ -10,7 +10,7 @@
   <style>
     :root {
       --champagne-gold: rgba(224, 202, 158, 0.9); 
-      --deep-space: #020205; 
+      --deep-space: #010103; 
       --text-main: #e8e8e8;
       --blur-bg: rgba(10, 15, 25, 0.75); 
     }
@@ -24,7 +24,7 @@
       -webkit-tap-highlight-color: transparent; 
     }
     
-    #3d-graph { width: 100vw; height: 100vh; }
+    #3d-graph { width: 100vw; height: 100vh; position: absolute; top: 0; left: 0; z-index: 1; }
     
     #poem-panel {
       position: absolute; 
@@ -42,7 +42,7 @@
       display: none;
       backdrop-filter: blur(15px); 
       -webkit-backdrop-filter: blur(15px);
-      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.8);
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.9);
       z-index: 10;
       transition: all 0.4s ease;
     }
@@ -103,6 +103,7 @@
       font-size: 0.85em;
       font-weight: 300;
       letter-spacing: 1px;
+      z-index: 5;
     }
   </style>
 </head>
@@ -127,7 +128,7 @@
   const pText = document.getElementById('poem-text');
   const closeBtn = document.getElementById('close-btn');
 
-  // Gerador de Textura de Estrela via Canvas (Não depende de imagens externas)
+  // Textura do Brilho
   function createGlowTexture() {
     const canvas = document.createElement('canvas');
     canvas.width = 64; canvas.height = 64;
@@ -144,15 +145,12 @@
 
   const glowTexture = createGlowTexture();
 
-  // Inicializa o Grafo
   const Graph = ForceGraph3D()(elem)
     .jsonUrl('data.json')
-    .backgroundColor('#020205') 
+    .backgroundColor('#010103') 
     .showNavInfo(false)
     .nodeThreeObject(node => {
-        // Cores: Ouro pra ela, Azul pros filhos/lar, Branco azulado pro resto
         const color = (node.group === 1) ? '#e0ca9e' : (node.group === 3 ? '#8aa8c2' : '#d4e2ed');
-        
         const material = new THREE.SpriteMaterial({
             map: glowTexture,
             color: color,
@@ -160,21 +158,57 @@
             blending: THREE.AdditiveBlending,
             depthWrite: false
         });
-        
         const sprite = new THREE.Sprite(material);
         const size = (node.val || 5) * 1.5; 
         sprite.scale.set(size, size, 1);
         return sprite;
     })
     .nodeLabel('name') 
-    .linkColor(() => 'rgba(255, 255, 255, 0.12)') 
+    .linkColor(() => 'rgba(255, 255, 255, 0.1)') 
     .linkWidth(0.5)
     .linkDirectionalParticles(2) 
-    .linkDirectionalParticleSpeed(d => d.value * 0.0015)
-    .linkDirectionalParticleWidth(1.5)
-    .linkDirectionalParticleColor(() => 'rgba(224, 202, 158, 0.8)');
+    .linkDirectionalParticleSpeed(d => d.value * 0.001)
+    .linkDirectionalParticleWidth(1.2)
+    .linkDirectionalParticleColor(() => 'rgba(224, 202, 158, 0.7)');
 
-  // Interação ao clicar no nó
+  // ------------------------------------------------------------
+  // INJEÇÃO DA NEBULOSA (Partículas de Fundo em Three.js)
+  // ------------------------------------------------------------
+  const scene = Graph.scene();
+  
+  // Criando 1500 estrelas microscópicas de fundo
+  const starGeo = new THREE.BufferGeometry();
+  const starCount = 1500;
+  const starPos = new Float32Array(starCount * 3);
+  
+  for(let i=0; i < starCount * 3; i++) {
+    // Espalha as estrelas num raio gigante
+    starPos[i] = (Math.random() - 0.5) * 2000; 
+  }
+  
+  starGeo.setAttribute('position', new THREE.BufferAttribute(starPos, 3));
+  
+  const starMat = new THREE.PointsMaterial({
+    color: 0x8aa8c2, // Tom azulado profundo
+    size: 1.5,
+    transparent: true,
+    opacity: 0.6,
+    map: glowTexture, // Usa o mesmo brilho suave
+    blending: THREE.AdditiveBlending,
+    depthWrite: false
+  });
+  
+  const stars = new THREE.Points(starGeo, starMat);
+  scene.add(stars);
+
+  // Animação da Nebulosa rodando em Loop
+  (function animateStars() {
+    stars.rotation.y += 0.0003; // Gira o universo lentamente
+    stars.rotation.x += 0.0001;
+    requestAnimationFrame(animateStars);
+  })();
+  // ------------------------------------------------------------
+
   Graph.onNodeClick(node => {
     const distance = 80;
     const distRatio = 1 + distance/Math.hypot(node.x, node.y, node.z);
@@ -182,16 +216,14 @@
     Graph.cameraPosition(
       { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio },
       node, 
-      2000 // Animação suave de câmera
+      2000 
     );
 
-    // Atualiza e mostra o painel
     pTitle.innerText = node.name;
     pText.innerText = node.text;
     panel.style.display = 'block';
   });
 
-  // Fecha o painel apenas no botão X
   closeBtn.addEventListener('click', () => {
     panel.style.display = 'none';
   });
