@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Constelação - 42 Anos</title>
+  <style>
+    body { 
+      margin: 0; 
+      overflow: hidden; 
+      background-color: #000; 
+      font-family: 'Helvetica Neue', Arial, sans-serif; 
+      color: #fff; 
+      touch-action: none; /* Previne comportamentos indesejados no mobile */
+    }
+    #3d-graph { width: 100vw; height: 100vh; }
+    
+    /* Painel Mobile-Friendly */
+    #poem-panel {
+      position: absolute; 
+      bottom: 5%; 
+      left: 50%; 
+      transform: translateX(-50%);
+      width: 85%; 
+      max-width: 400px;
+      max-height: 60vh;
+      background: rgba(10, 15, 25, 0.85);
+      border: 1px solid rgba(255, 255, 255, 0.2); 
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.8);
+      border-radius: 16px; 
+      padding: 25px 20px 20px;
+      overflow-y: auto; 
+      display: none;
+      backdrop-filter: blur(10px); 
+      -webkit-backdrop-filter: blur(10px);
+      z-index: 10;
+    }
+    
+    #poem-panel h2 { 
+      font-size: 1.3em; 
+      color: #e0ca9e; /* Tom de ouro pálido/champagne, mais elegante */
+      margin: 0 0 15px 0; 
+      font-weight: 300;
+      letter-spacing: 1px;
+    }
+    
+    #poem-panel p { 
+      font-size: 1em; 
+      line-height: 1.6; 
+      color: #e8e8e8; 
+      font-weight: 300;
+      margin: 0;
+    }
+
+    /* Botão de fechar para o mobile */
+    #close-btn {
+      position: absolute;
+      top: 15px;
+      right: 15px;
+      background: none;
+      border: none;
+      color: rgba(255, 255, 255, 0.5);
+      font-size: 1.2em;
+      cursor: pointer;
+      padding: 5px;
+    }
+
+    #close-btn:active {
+      color: #fff;
+    }
+    
+    /* Instruções iniciais limpas */
+    #instructions {
+      position: absolute; 
+      top: 15px; 
+      width: 100%;
+      text-align: center;
+      pointer-events: none; 
+      color: rgba(255,255,255,0.4);
+      font-size: 0.85em;
+      font-weight: 300;
+      letter-spacing: 1px;
+    }
+  </style>
+</head>
+<body>
+
+<div id="3d-graph"></div>
+<div id="instructions">Toque e arraste para explorar o universo</div>
+
+<div id="poem-panel">
+  <button id="close-btn">✕</button>
+  <h2 id="poem-title"></h2>
+  <p id="poem-text"></p>
+</div>
+
+<script src="//unpkg.com/3d-force-graph"></script>
+<script src="//unpkg.com/three"></script>
+
+<script>
+  const elem = document.getElementById('3d-graph');
+  const panel = document.getElementById('poem-panel');
+  const pTitle = document.getElementById('poem-title');
+  const pText = document.getElementById('poem-text');
+  const closeBtn = document.getElementById('close-btn');
+
+  const Graph = ForceGraph3D()(elem)
+    .jsonUrl('data.json')
+    .backgroundColor('#020205') 
+    .showNavInfo(false)
+    .nodeColor(node => {
+        if(node.group === 1) return '#e0ca9e'; // Ouro/Champagne para ela
+        if(node.group === 3) return '#8aa8c2'; // Azul suave para vocês (filhos/lar)
+        return '#d4e2ed'; // Branco azulado para o resto
+    })
+    .nodeVal(node => node.val || 5)
+    .nodeOpacity(0.9)
+    .nodeLabel('name') 
+    .linkColor(() => 'rgba(255, 255, 255, 0.15)') 
+    .linkWidth(0.5)
+    .linkDirectionalParticles(1) // Otimizado para não travar no mobile
+    .linkDirectionalParticleSpeed(d => d.value * 0.001)
+    .linkDirectionalParticleColor(() => 'rgba(224, 202, 158, 0.8)');
+
+  Graph.onNodeClick(node => {
+    // Zoom mais suave e adaptado para telas menores
+    const distance = 80;
+    const distRatio = 1 + distance/Math.hypot(node.x, node.y, node.z);
+    
+    Graph.cameraPosition(
+      { x: node.x * distRatio, y: node.y * distRatio, z: node.z * distRatio },
+      node, 
+      2000 
+    );
+
+    pTitle.innerText = node.name;
+    pText.innerText = node.text;
+    panel.style.display = 'block';
+  });
+
+  // Fecha o painel
+  closeBtn.addEventListener('click', () => {
+    panel.style.display = 'none';
+  });
+
+  Graph.onBackgroundClick(() => {
+    panel.style.display = 'none';
+  });
+
+</script>
+</body>
+  </html>
+  
